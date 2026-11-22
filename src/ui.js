@@ -1,6 +1,6 @@
 const OL=[["Eğitim",30],["Toplam deneyim",25],["Yöneticilik",25],["Yayın/sertifika",10],["Uluslararası",10]];
 const LL=[["Alan uyumu",30],["Sektör deneyimi",30],["Kurum içi kariyer",15],["Önceki görev benzerliği",25]];
-const TCOL={"Cumhurbaşkanlığı":"#c8102e","Bakanlık":"#1f5fa8","Bağlı/ilgili kurum":"#00916b","Düzenleyici kurul":"#7b4fb0","Bağımsız kurum":"#d98a00","KİT / kamu şirketi":"#3aa3db","Yargı, Meclis ve TSK":"#4d5a66"};
+const TCOL={"Cumhurbaşkanlığı":"#c8102e","Bakanlık":"#1f5fa8","Bağlı/ilgili kurum":"#00916b","Düzenleyici kurul":"#7b4fb0","Bağımsız kurum":"#d98a00","KİT / kamu şirketi":"#3aa3db","Yargı, Meclis ve TSK":"#4d5a66","TBMM komisyonu":"#b0417a"};
 const tot=(a,L)=>{if(!a)return null;let s=0,m=0;a.forEach((x,i)=>{if(typeof x==="number"){s+=x;m+=L[i][1]}});return{s,m,p:Math.round(s/m*100),part:m<100}};
 P.forEach(p=>{p.os=tot(p.o,OL);p.ls=tot(p.l,LL);p.st=p.v==="bos"?"b":(p.v==="yok"||p.v==="yetersiz")?"y":"p"});
 const $=id=>document.getElementById(id);
@@ -109,7 +109,7 @@ const act=[];if(sel)act.push(["t",`Kurum türü: ${sel}`]);if(qf)act.push(["q",q
 $("active").innerHTML=act.map(([k,l])=>`<span class="badge">${esc(l)}<button data-k="${k}" aria-label="${esc(l)} filtresini kaldır">×</button></span>`).join("");
 const lim=showAll||qq||sel||f||qf?L.length:24,V=L.slice(0,lim);
 moreB.hidden=V.length>=L.length;moreB.textContent=`Tümünü göster (${L.length})`;
-grid.innerHTML=V.length?V.map(p=>`<button class="card" data-id="${p.id}"><div class="av" style="--c:${avc(p)}">${esc(ini(p.n))}</div><div><div class="nm">${esc(p.n)}</div><div class="ro">${esc(p.u)} · ${esc(p.k)}</div><div class="ty"><span class="dot" style="--c:${avc(p)}"></span>${esc(p.t)}</div>${meter("Özgeçmiş",p.os,"o")}${meter("Liyakat",p.ls,"l")}<div class="tags">${tagMap(p)}</div></div></button>`).join(""):'<p class="empty">Bu filtrelere uyan kayıt yok.</p>';
+grid.innerHTML=V.length?V.map(p=>`<button class="card" data-id="${p.id}"><div class="av" style="--c:${avc(p)}">${esc(ini(p.n))}</div><div><div class="nm">${esc(p.n)}</div><div class="ro">${esc(p.u)} · ${esc(p.k)}</div>${p.pt?`<div class="ty">${esc(p.pt)} · ${esc(p.il)} milletvekili</div>`:""}<div class="ty"><span class="dot" style="--c:${avc(p)}"></span>${esc(p.t)}</div>${meter("Özgeçmiş",p.os,"o")}${meter("Liyakat",p.ls,"l")}<div class="tags">${tagMap(p)}</div></div></button>`).join(""):'<p class="empty">Bu filtrelere uyan kayıt yok.</p>';
 }
 $("active").onclick=e=>{const b=e.target.closest("button");if(!b)return;b.dataset.k==="t"?setSel(""):setQf(null)};
 q.oninput=()=>{showAll=false;hideTip();draw();cards()};
@@ -129,13 +129,13 @@ const rk=p.st==="p"?[...peers].sort((a,b)=>b.ls.p-a.ls.p).indexOf(p)+1:0;
 const cmp=peers.length>1&&p.st==="p"?`<p class="cmp">${esc(p.t)} ortalaması: özgeçmiş ${avg("os")}, liyakat ${avg("ls")} · liyakatte ${peers.length} kişi içinde ${rk}.</p>`:"";
 const li=lastList.indexOf(p.id),prv=li>0?lastList[li-1]:null,nxt=li>=0&&li<lastList.length-1?lastList[li+1]:null;
 const warn=p.st==="y"?"Görevdeki kişi doğrulandı, ancak puanlamaya yetecek özgeçmiş bilgisi açık kaynaklarda bulunamadı.":p.st==="b"?"Makam şu an boş; atama yapıldığında kayıt güncellenecek.":p.alt?"Kariyer kronolojisi kısmen belgelendi; puanlar yalnızca belgelenmiş verilere dayanan bir alt sınır.":p.os&&p.os.part?"Bazı ölçütler veri yokluğu ya da uygulanamazlık nedeniyle puanlanmadı; toplam 100'e oranlandı (* işareti).":"";
-const inf=[["Kurum",p.k],["Kurum türü",p.t],["Unvan",p.u],["Atanma",p.d],["Doğum yılı",p.dy],["Eğitim",p.ed],["Kariyer",p.kr]].filter(r=>r[1]);
+const inf=[["Kurum",p.k],["Kurum türü",p.t],["Unvan",p.u],["Parti",p.pt],["Seçim bölgesi",p.il],["Atanma",p.d],["Doğum yılı",p.dy],["Eğitim",p.ed],["Kariyer",p.kr]].filter(r=>r[1]);
 $("dbody").innerHTML=`<div class="nav2"><button class="btn" id="bk">← Listeye dön</button>${prv?`<button class="btn" data-go="${prv}">‹ Önceki</button>`:""}${nxt?`<button class="btn" data-go="${nxt}">Sonraki ›</button>`:""}</div>
 <div class="dh"><div class="av big" style="--c:${avc(p)}">${esc(ini(p.n))}</div><div><h2 tabindex="-1">${esc(p.n)}</h2><div class="ro">${esc(p.u)} · ${esc(p.k)}</div><div class="tags">${tagMap(p)}</div></div><div class="big2">${big(p.os,"Özgeçmiş")}${big(p.ls,"Liyakat")}</div></div>
 ${cmp}${warn?`<div class="warn">${warn}</div>`:""}
 <div class="cols"><div><h3>Özgeçmiş skoru</h3>${sub(p.o,OL,p.g&&p.g.o,"o")}</div><div><h3>Liyakat skoru</h3>${sub(p.l,LL,p.g&&p.g.l,"l")}</div></div>
 <div class="cols" style="margin-bottom:48px"><div><h3>Bilgiler</h3><dl>${inf.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl></div>
-<div class="src"><h3>Kaynaklar</h3>${p.bio?`<p>Resmî biyografi ve fotoğraf: <a href="${esc(p.bio)}">${esc(host(p.bio))}</a></p>`:'<p class="note">Resmî biyografi sayfası bulunamadı.</p>'}${(p.src||[]).map((u,i)=>`<p>Kaynak ${i+1}: <a href="${esc(u)}">${esc(host(u))}</a></p>`).join("")}<p><a href="#yontem">Puanlar nasıl hesaplandı?</a></p><p class="note">Son kontrol: 22 Kasım 2026</p></div></div>`;
+<div class="src"><h3>Kaynaklar</h3>${p.bio?`<p>Resmî biyografi ve fotoğraf: <a href="${esc(p.bio)}">${esc(host(p.bio))}</a></p>`:'<p class="note">Resmî biyografi sayfası bulunamadı.</p>'}${(p.src||[]).map((u,i)=>`<p>Kaynak ${i+1}: <a href="${esc(u)}">${esc(host(u))}</a></p>`).join("")}<p><a href="#yontem">Puanlar nasıl hesaplandı?</a></p><p class="note">Son kontrol: 23 Kasım 2026</p></div></div>`;
 $("bk").onclick=()=>{back=true;location.hash=""};
 $("dbody").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{location.hash="p"+b.dataset.go});
 }

@@ -1,5 +1,5 @@
 // Önbellek sürümü index.html içeriğinden üretilir; yeni sürüm yayınlanınca eskisi silinir.
-const V = "liyakat-330f0a7a77";
+const V = "liyakat-3c88f10782";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 self.addEventListener("install", e => {
